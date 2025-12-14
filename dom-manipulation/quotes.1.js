@@ -33,4 +33,6 @@ let quotes = JSON.parse(localStorage.getItem("quotes")) || [
     { id: 1, text: "Stay hungry, stay foolish.", category: "Motivation" },
     { id: 2, text: "Talk is cheap. Show me the code.", category: "Programming" }
 ];
+let quotes = JSON.parse(localStorage.getItem("quotes")) || [];
+const API_URL = "https://jsonplaceholder.typicode.com/posts";
 

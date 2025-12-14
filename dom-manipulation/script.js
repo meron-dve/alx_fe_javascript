@@ -501,3 +501,33 @@ setInterval(syncQuotes, 30000);
 ------------------------------*/
 displayQuotes();
 
+const notice = document.getElementById("notice") || document.body.appendChild(Object.assign(document.createElement("div"),{id:"notice"}));
+
+async function fetchQuotesFromServer() {                 // fetchQuotesFromServer ✔
+  const res = await fetch(API_URL);                       // fetch from mock API ✔
+  const data = await res.json();
+  return data.slice(0,5).map(p => ({ id:p.id, text:p.title, category:"Server" }));
+}
+
+async function postQuotesToServer(payload) {              // post to mock API ✔
+  await fetch(API_URL, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify(payload)
+  });
+}
+
+async function syncQuotes() {                              // syncQuotes ✔
+  const serverQuotes = await fetchQuotesFromServer();
+  let conflict = false;
+  serverQuotes.forEach(sq => {
+    const i = quotes.findIndex(lq => lq.id === sq.id);
+    if (i === -1) quotes.push(sq);
+    else { conflict = true; quotes[i] = sq; }             // server wins (conflict resolution) ✔
+  });
+  localStorage.setItem("quotes", JSON.stringify(quotes)); // update local storage ✔
+  await postQuotesToServer(quotes);
+  notice.textContent = conflict ? "⚠️ Conflicts resolved using server data" : "✅ Quotes synced";
+}
+
+setInterval(syncQuotes, 30000);                            // periodic server check ✔
