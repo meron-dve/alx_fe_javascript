@@ -28,4 +28,9 @@ let quotes = [
     { text: "Talk is cheap. Show me the code.", category: "Programming" },
     { text: "Success is not final; failure is not fatal.", category: "Motivation" }
 ];
+const quoteDisplay = document.getElementById("quoteDisplay");
+let quotes = JSON.parse(localStorage.getItem("quotes")) || [
+    { id: 1, text: "Stay hungry, stay foolish.", category: "Motivation" },
+    { id: 2, text: "Talk is cheap. Show me the code.", category: "Programming" }
+];
 

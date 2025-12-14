@@ -407,3 +407,97 @@ function restoreLastCategory() {
 --------------------------------*/
 populateCategories();
 restoreLastCategory();
+const API_URL = "https://jsonplaceholder.typicode.com/posts";
+
+const notification = document.createElement("div");
+document.body.prepend(notification);
+
+/* -----------------------------
+   Save to Local Storage
+------------------------------*/
+function saveQuotes() {
+  localStorage.setItem("quotes", JSON.stringify(quotes));
+}
+
+/* -----------------------------
+   Display Quotes
+------------------------------*/
+function displayQuotes(data = quotes) {
+  quoteDisplay.innerHTML = "";
+  data.forEach(q => {
+    const p = document.createElement("p");
+    p.textContent = `"${q.text}" (${q.category})`;
+    quoteDisplay.appendChild(p);
+  });
+}
+
+/* -----------------------------
+   Fetch Quotes From Server
+------------------------------*/
+async function fetchServerQuotes() {
+  const response = await fetch(API_URL);
+  const serverData = await response.json();
+
+  // Convert server posts to quote format
+  return serverData.slice(0, 5).map(post => ({
+    id: post.id,
+    text: post.title,
+    category: "Server"
+  }));
+}
+
+/* -----------------------------
+   Sync Logic (Server Wins)
+------------------------------*/
+async function syncQuotes() {
+  const serverQuotes = await fetchServerQuotes();
+  let conflictDetected = false;
+
+  serverQuotes.forEach(serverQuote => {
+    const localIndex = quotes.findIndex(q => q.id === serverQuote.id);
+
+    if (localIndex === -1) {
+      quotes.push(serverQuote);
+    } else {
+      conflictDetected = true;
+      quotes[localIndex] = serverQuote; // server takes precedence
+    }
+  });
+
+  saveQuotes();
+  displayQuotes();
+  notify(conflictDetected
+    ? "⚠️ Conflicts detected. Server data applied."
+    : "✅ Quotes synced successfully.");
+}
+
+/* -----------------------------
+   Notification System
+------------------------------*/
+function notify(message) {
+  notification.textContent = message;
+  notification.style.background = "#222";
+  notification.style.color = "#fff";
+  notification.style.padding = "10px";
+  setTimeout(() => notification.textContent = "", 4000);
+}
+
+/* -----------------------------
+   Manual Conflict Resolution
+------------------------------*/
+function manualResolve() {
+  if (confirm("Reload server data and overwrite local quotes?")) {
+    syncQuotes();
+  }
+}
+
+/* -----------------------------
+   Periodic Sync (Every 30s)
+------------------------------*/
+setInterval(syncQuotes, 30000);
+
+/* -----------------------------
+   Initialize
+------------------------------*/
+displayQuotes();
+

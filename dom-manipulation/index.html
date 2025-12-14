@@ -17,8 +17,12 @@
   type="file"
   id="importFile"
   accept=".json"
+
 />
 <label for="categoryFilter">Filter by Category:</label>
 <select id="categoryFilter">
 <option value="all">All Categories</option>
 </select>
+<button onclick="syncQuotes()">Sync with Server</button>
+<button onclick="manualResolve()">Resolve Conflicts</button>
+<div id="quoteDisplay"></div>
