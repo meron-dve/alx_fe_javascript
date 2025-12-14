@@ -1,3 +1,5 @@
+import { loadQuotes } from "./script";
+
 export const quotes = [
     // ===== FUNCTION: SHOW RANDOM QUOTE =====
     function showRandomQuote() {
@@ -19,4 +21,6 @@ export const quotes = [
         quoteDisplay.appendChild(quoteText);
         quoteDisplay.appendChild(quoteCategory);
     }()
-];
+];let quotes = loadQuotes();
+exports.quotes = quotes;
+

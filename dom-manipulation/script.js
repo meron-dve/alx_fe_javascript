@@ -1,4 +1,4 @@
-const { quotes } = require("./quotes");
+const { quotes, quotes } = require("./quotes");
 const { quotes } = require("./quotes.1");
 
 
@@ -154,8 +154,9 @@ function loadQuotes() {
   }
   return [];
 }
+exports.loadQuotes = loadQuotes;
 
-let quotes = loadQuotes();
+
 sessionStorage.setItem("lastQuote", JSON.stringify(quote));
 function displayRandomQuote() {
   const quote = quotes[randomIndex];
@@ -215,3 +216,82 @@ function importFromJsonFile(event) {
 
   fileReader.readAsText(event.target.files[0]);
 }
+// ===== STORAGE KEYS =====
+const STORAGE_KEY = "dynamic_quotes";
+
+
+// ===== LOAD QUOTES FROM LOCAL STORAGE =====
+function loadQuotes() {
+const savedQuotes = localStorage.getItem(STORAGE_KEY);
+if (savedQuotes) {
+return JSON.parse(savedQuotes);
+}
+return [];
+}
+exports.loadQuotes = loadQuotes;
+
+
+// ===== SAVE QUOTES TO LOCAL STORAGE =====
+function saveQuotes() {
+localStorage.setItem(STORAGE_KEY, JSON.stringify(quotes));
+}
+let quotes = loadQuotes();
+
+
+// Fallback default quotes
+if (quotes.length === 0) {
+quotes = [
+{ text: "Believe in yourself", category: "Motivation" },
+{ text: "Success is earned", category: "Success" }
+];
+saveQuotes();
+}
+const categoryFilter = document.getElementById("categoryFilter");
+const FILTER_KEY = "selected_category";
+
+
+function populateCategories() {
+const categories = new Set();
+quotes.forEach(q => categories.add(q.category));
+
+
+// Reset dropdown
+categoryFilter.innerHTML = '<option value="all">All Categories</option>';
+
+
+categories.forEach(category => {
+const option = document.createElement("option");
+option.value = category;
+option.textContent = category;
+categoryFilter.appendChild(option);
+});
+}
+function filterQuotes() {
+const selectedCategory = categoryFilter.value;
+
+
+// Save filter preference
+localStorage.setItem(FILTER_KEY, selectedCategory);
+
+
+quoteDisplay.innerHTML = "";
+
+
+const filteredQuotes = selectedCategory === "all"
+? quotes
+: quotes.filter(q => q.category === selectedCategory);
+
+
+if (filteredQuotes.length === 0) {
+quoteDisplay.textContent = "No quotes in this category";
+return;
+}
+
+
+filteredQuotes.forEach(quote => {
+const p = document.createElement("p");
+p.textContent = `"${quote.text}" (${quote.category})`;
+quoteDisplay.appendChild(p);
+});
+}
+localStorage.setItem("selected_category", selectedCategory);
