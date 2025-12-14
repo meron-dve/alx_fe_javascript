@@ -533,7 +533,7 @@ async function syncQuotes() {                              // syncQuotes ✔
 setInterval(syncQuotes, 30000);                            // periodic server check ✔
 // Function to display notifications
 function showNotification(message, duration = 4000) {
-  notification.textContent = message;
+  notification.textContent = message;                  // <-- Message to show, e.g., "Quotes synced with server!"
   notification.style.background = "#222";
   notification.style.color = "#fff";
   notification.style.padding = "10px";
@@ -541,10 +541,13 @@ function showNotification(message, duration = 4000) {
   notification.style.top = "10px";
   notification.style.right = "10px";
   notification.style.zIndex = "1000";
-  setTimeout(() => { notification.textContent = ""; }, duration);
+
+  setTimeout(() => {
+    notification.textContent = "";
+  }, duration);
 }
 
-// Usage example within syncQuotes function
+// Example usage within syncQuotes function
 async function syncQuotes() {
   const serverQuotes = await fetchQuotesFromServer();
   let conflict = false;
@@ -552,17 +555,15 @@ async function syncQuotes() {
   serverQuotes.forEach(sq => {
     const i = quotes.findIndex(lq => lq.id === sq.id);
     if (i === -1) quotes.push(sq);
-    else { conflict = true; quotes[i] = sq; } // server wins
+    else { conflict = true; quotes[i] = sq; } // server data takes precedence
   });
 
   localStorage.setItem("quotes", JSON.stringify(quotes));
 
-  // Notify user about sync status
-  showNotification(conflict ? "⚠️ Conflicts resolved using server data" : "✅ Quotes synced");
+  // Show proper notification
+  if (conflict) {
+    showNotification("⚠️ Conflicts resolved using server data");
+  } else {
+    showNotification("✅ Quotes synced with server!");   // <-- Added message that was missing
+  }
 }
-
-// Optional: Add a manual resolve button
-const resolveBtn = document.getElementById("resolveBtn") || document.body.appendChild(
-  Object.assign(document.createElement("button"), { id: "resolveBtn", textContent: "Resolve Conflicts Manually" })
-);
-resolveBtn.onclick = () => syncQuotes();
