@@ -192,3 +192,26 @@ function importFromJsonFile(event) {
   fileReader.readAsText(event.target.files[0]);
 }
 importInput.addEventListener("change", importFromJsonFile);
+const importInput = document.getElementById("importFile");
+importInput.addEventListener("change", importFromJsonFile);
+function importFromJsonFile(event) {
+  const fileReader = new FileReader();
+
+  fileReader.onload = function (e) {
+    try {
+      const importedQuotes = JSON.parse(e.target.result);
+
+      // Add imported quotes to existing quotes
+      quotes.push(...importedQuotes);
+
+      // Persist updated quotes
+      saveQuotes();
+
+      alert("Quotes imported successfully!");
+    } catch (error) {
+      alert("Invalid JSON file");
+    }
+  };
+
+  fileReader.readAsText(event.target.files[0]);
+}
