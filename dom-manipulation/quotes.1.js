@@ -35,4 +35,9 @@ let quotes = JSON.parse(localStorage.getItem("quotes")) || [
 ];
 let quotes = JSON.parse(localStorage.getItem("quotes")) || [];
 const API_URL = "https://jsonplaceholder.typicode.com/posts";
+// ✅ UI Elements / Notifications for Data Updates or Conflicts
+// Create a notification div (if not already in HTML)
+const notification = document.getElementById("notification") || document.body.appendChild(
+    Object.assign(document.createElement("div"), { id: "notification" })
+);
 

@@ -531,3 +531,38 @@ async function syncQuotes() {                              // syncQuotes ✔
 }
 
 setInterval(syncQuotes, 30000);                            // periodic server check ✔
+// Function to display notifications
+function showNotification(message, duration = 4000) {
+  notification.textContent = message;
+  notification.style.background = "#222";
+  notification.style.color = "#fff";
+  notification.style.padding = "10px";
+  notification.style.position = "fixed";
+  notification.style.top = "10px";
+  notification.style.right = "10px";
+  notification.style.zIndex = "1000";
+  setTimeout(() => { notification.textContent = ""; }, duration);
+}
+
+// Usage example within syncQuotes function
+async function syncQuotes() {
+  const serverQuotes = await fetchQuotesFromServer();
+  let conflict = false;
+
+  serverQuotes.forEach(sq => {
+    const i = quotes.findIndex(lq => lq.id === sq.id);
+    if (i === -1) quotes.push(sq);
+    else { conflict = true; quotes[i] = sq; } // server wins
+  });
+
+  localStorage.setItem("quotes", JSON.stringify(quotes));
+
+  // Notify user about sync status
+  showNotification(conflict ? "⚠️ Conflicts resolved using server data" : "✅ Quotes synced");
+}
+
+// Optional: Add a manual resolve button
+const resolveBtn = document.getElementById("resolveBtn") || document.body.appendChild(
+  Object.assign(document.createElement("button"), { id: "resolveBtn", textContent: "Resolve Conflicts Manually" })
+);
+resolveBtn.onclick = () => syncQuotes();
